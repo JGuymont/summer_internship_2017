@@ -1,13 +1,11 @@
 m=100000
 l=18250
 inSample_length = 50
-setwd('/home/gj/Desktop/Link to risque/Agriculture/Quebec/Data')
-folder_source <- '/home/gj/Desktop/Link to risque/Agriculture/Quebec/R/pricing/'
 library(fGarch)
 library(copula)
 library(parallel)
 
-load('dbTemp.Rdata')
+load('temperatures.Rdata')
 load('garchtrorder.Rdata')
 load('data_rain_mai.Rdata')
 
@@ -20,8 +18,8 @@ scale_det = fit_rain_dist$scale.det
 shape_ch  = fit_rain_dist$shape.ch
 scale_ch  = fit_rain_dist$scale.ch
 
-source(paste0(folder_source,'rain_copula.R'))
-source(paste0(folder_source,'functions.R'))
+source('./rain_copula.R')
+source('./functions.R')
 
 # Section: DAT model ------------------------------------------------------------
 seatrend <- fitted(lm(Mean~t+Fourier(3,18250), data = db.temp))

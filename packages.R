@@ -1,4 +1,9 @@
-library(fGarch)   # for skewed normal distribution
-library(copula)   # Fitting copula models and goodness-of-fit tests. 
-library(rugarch)  # GARCH modeling and testing environment
-library(parallel) # package for parallel computing
+#install.packages("devtools")
+#install.packages("fGarch")
+#install.packages("kernlab", type="source")
+# install.packages("kernlab")
+install.packages("rugarch")
+#install.packages("raster")
+#install.packages("maps")
+#install.packages("ggmap") 
+#install.packages("fitdistrplus")
