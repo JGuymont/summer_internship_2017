@@ -76,7 +76,7 @@ tvar = function(x, p){
     return(TVaR)
 }
 
-cost = function(par, R, AccRain, AccCDD, AccHDD, cost_function, q){
+cost = function(par, R, AccRain, AccCDD, AccHDD, expected_payoff, cost_function, q){
   
     a  = exp(par[1])
     b  = exp(par[2])
@@ -88,10 +88,10 @@ cost = function(par, R, AccRain, AccCDD, AccHDD, cost_function, q){
     K3 = round(exp(par[7]))
     K4 = round(exp(par[8]))
     
-    WD1 = a*(pmax(AccRain[,2] -K1,0) - price_call_rain[price_call_rain[,1]== K1,2])
-    WD2 = b*(pmax(AccCDD - K2,0)     - price_call_cdd[price_call_cdd[,1] == K2,2])
-    WD3 = c*(pmax(AccHDD - K3,0)     - price_call_hdd[ price_call_hdd[,1] == K3,2])
-    WD4 = d*(pmax(K4-AccCDD,0)       - price_put_cdd[price_put_cdd[,1] == K4,2])
+    WD1 = a*(pmax(AccRain[,2] -K1,0) - expected_payoff$price_call_rain[expected_payoff$price_call_rain[,1]== K1,2])
+    WD2 = b*(pmax(AccCDD - K2,0)     - expected_payoff$price_call_cdd[expected_payoff$price_call_cdd[,1] == K2,2])
+    WD3 = c*(pmax(AccHDD - K3,0)     - expected_payoff$price_call_hdd[expected_payoff$price_call_hdd[,1] == K3,2])
+    WD4 = d*(pmax(K4-AccCDD,0)       - expected_payoff$price_put_cdd[expected_payoff$price_put_cdd[,1] == K4,2])
     
     profit = R + WD1 + WD2 + WD3 + WD4
     

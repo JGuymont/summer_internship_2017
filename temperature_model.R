@@ -40,10 +40,10 @@ compute_bic = function(par, res, t){
     spec = rugarch::ugarchspec(
         variance.model = list(model='eGARCH',external.regressors = X),
         distribution.model = "snorm",
-        mean.model = list(armaOrder = c(P, 0),include.mean=FALSE),
+        mean.model = list(armaOrder=c(P, 0), include.mean=FALSE),
         start.pars = list(omega=1.1, alpha1=0.1,beta1=0.5)
     )
-    egarchfit = ugarchfit(spec=spec, data=res)
+    egarchfit = rugarch::ugarchfit(spec=spec, data=res)
     k = length(coef(egarchfit))
     bic = k*log(l)-2*likelihood(egarchfit)
     return(bic)
@@ -63,28 +63,33 @@ fit_seasonal_trend = function(fourier_size, series_length, temperatures_data, da
 	seasonal_trend = fitted(seasonal_trend_model)
 	delta_temp = dat - seasonal_trend
 
-	return(list(coef=seasonal_trend_model$coefficients, delta_temp=delta_temp))
+	return(list(coef=seasonal_trend_model$coefficients, delta_temp=delta_temp, fitted=seasonal_trend))
 }
 
-fit_garch_model = function(delta_temp, training_days){
+fit_garch_model = function(delta_temp, training_days, fourier_size=NA, num_lag=NA){
 	"Fit temperatures volatility"
-	# best hyperparameters for the mean 
-	# of the garch model
-	garch_order = best_garch_order(maxM2=6, maxP=4, delta_temp, training_days)
-	# order of the fourier series
-	M2 = garch_order[1]
-	
-	# arma order for the mean of the residual
-	P = garch_order[2]
 
-	spec = ugarchspec(
-  		variance.model = list(model='eGARCH', external.regressors=Fourier(M2, length(training_days))), 
+    if (is.na(num_lag) | is.na(num_lag)) {
+        # best hyperparameters for the mean 
+	    # of the garch model
+	    garch_order = best_garch_order(maxM2=6, maxP=4, delta_temp, training_days)
+
+	    # order of the fourier series
+	    fourier_size = garch_order[1]
+	
+	    # arma order for the mean of the residual
+	    num_lag = garch_order[2]
+    }
+	
+
+	spec = rugarch::ugarchspec(
+  		variance.model = list(model='eGARCH', external.regressors=Fourier(fourier_size, length(training_days))), 
   		distribution.model = "snorm",
-  		mean.model = list(armaOrder = c(P, 0), include.mean=FALSE), 
-  		start.pars = list(omega=1.1, alpha1=0.1,beta1=0.5)
+  		mean.model = list(armaOrder = c(num_lag, 0), include.mean=FALSE),
+  		start.pars = list(omega=1.1, alpha1=0.1, beta1=0.5)
 	)
 
-	egarchfit = ugarchfit(spec=spec, data=delta_temp) 
+	egarchfit = rugarch::ugarchfit(spec=spec, data=delta_temp) 
 	garch_params = data.frame(coef(egarchfit)) 
     sdhat = as.numeric(sigma(egarchfit))
 
